@@ -69,30 +69,33 @@ function GroupDetailsPage() {
     }
   };
 
-  const handleMarkFinished = async (item) => {
-    const confirm = window.confirm("Do you want to add this item to the shopping list?");
-    const addToShopping = confirm ? "true" : "false";
-
-    try {
-      const res = await fetch(`http://localhost:8080/api/inventory/finish/${item.itemId}?addToShopping=${addToShopping}`, {
-        method: 'DELETE'
-      });
-      if (res.ok) {
-        alert("Item marked as finished.");
-        const invRes = await fetch(`http://localhost:8080/api/inventory/${groupName}`);
-        const invData = await invRes.json();
-        setInventoryItems(invData);
-      } else {
-        alert("Failed to update item.");
-      }
-    } catch (err) {
-      console.error("Error marking item as finished:", err);
-    }
-  };
-
   const displayName = localStorage.getItem('displayName');
 
+  const handleLogout = () => {
+    localStorage.removeItem('loggedInUsername');
+    localStorage.removeItem('displayName');
+    navigate('/');
+  };
 
+  const handleExitGroup = async () => {
+    const confirmExit = window.confirm("Are you sure you want to exit this group?");
+    if (!confirmExit) return;
+  
+    const username = localStorage.getItem('loggedInUsername');
+    try {
+      const res = await fetch(`http://localhost:8080/api/groups/${groupId}/exit?username=${username}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        alert("You have exited the group.");
+        navigate('/dashboard');
+      } else {
+        alert("Failed to exit group.");
+      }
+    } catch (err) {
+      console.error("Exit group error:", err);
+    }
+  };  
 
   return (
     <div style={{ padding: '20px', position: 'relative' }}>
@@ -109,6 +112,8 @@ function GroupDetailsPage() {
     approvedMembers={approvedMembers}
     pendingMembers={pendingMembers}
     onApprove={handleApprove}
+    onLogout={handleLogout}
+    onExitGroup={handleExitGroup}
   />
 )}
       <div style={{ marginTop: '30px' }}>

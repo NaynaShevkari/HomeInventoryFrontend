@@ -1,98 +1,3 @@
-// import React, { useState, useEffect } from 'react';
-
-// function InventorySection({ groupName }) {
-//   const [inventoryItems, setInventoryItems] = useState([]);
-
-//   useEffect(() => {
-//     if (groupName) {
-//       fetch(`http://localhost:8080/api/inventory/${groupName}`)
-//         .then(res => res.json())
-//         .then(data => setInventoryItems(data))
-//         .catch(err => console.error('Error fetching inventory:', err));
-//     }
-//   }, [groupName]);
-
-//   const handleAddItem = async (e) => {
-//     e.preventDefault();
-//     const formData = new FormData(e.target);
-//     const itemName = formData.get('itemName');
-//     const quantity = formData.get('quantity');
-//     const unit = formData.get('unit');
-//     const expiryDate = formData.get('expiryDate');
-//     const username = localStorage.getItem('loggedInUsername');
-
-//     const params = new URLSearchParams({
-//       groupName,
-//       username,
-//       itemName,
-//       quantity,
-//       unit
-//     });
-//     if (expiryDate) params.append('expiryDate', expiryDate);
-
-//     const res = await fetch(`http://localhost:8080/api/inventory/add?${params.toString()}`, {
-//       method: 'POST',
-//     });
-
-//     if (res.ok) {
-//       alert('Item added!');
-//       e.target.reset();
-//       const updated = await fetch(`http://localhost:8080/api/inventory/${groupName}`);
-//       setInventoryItems(await updated.json());
-//     } else {
-//       alert('Failed to add item');
-//     }
-//   };
-
-//   const handleMarkFinished = async (item) => {
-//     const confirm = window.confirm('Do you want to add this item to the shopping list?');
-//     const addToShopping = confirm ? 'true' : 'false';
-
-//     const res = await fetch(`http://localhost:8080/api/inventory/finish/${item.itemId}?addToShopping=${addToShopping}`, {
-//       method: 'DELETE'
-//     });
-
-//     if (res.ok) {
-//       alert('Item marked as finished.');
-//       const updated = await fetch(`http://localhost:8080/api/inventory/${groupName}`);
-//       setInventoryItems(await updated.json());
-//     } else {
-//       alert('Failed to update item.');
-//     }
-//   };
-
-//   return (
-//     <div style={{ marginTop: '20px' }}>
-//       <h3>📦 Inventory Items</h3>
-
-//       <form onSubmit={handleAddItem} style={{ marginBottom: '30px' }}>
-//         <input name="itemName" placeholder="Item Name" required />
-//         <input name="quantity" type="number" placeholder="Quantity" required style={{ width: '80px' }} />
-//         <input name="unit" placeholder="Unit (e.g. kg, pcs)" required />
-//         <input name="expiryDate" type="date" />
-//         <button type="submit">Add</button>
-//       </form>
-
-//       {inventoryItems.length > 0 ? (
-//         <ul>
-//           {inventoryItems.map(item => (
-//             <li key={item.itemId}>
-//               {item.itemName} — {item.quantity} {item.unit}
-//               {item.expiryDate ? ` (expires on ${item.expiryDate})` : ''}
-//               <button onClick={() => handleMarkFinished(item)} style={{ marginLeft: '10px' }}>Mark Finished</button>
-//             </li>
-//           ))}
-//         </ul>
-//       ) : (
-//         <p>No items in inventory.</p>
-//       )}
-//     </div>
-//   );
-// }
-
-// export default InventorySection;
-
-
 import React, { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 
@@ -215,7 +120,18 @@ function InventorySection({ groupName }) {
         <input name="itemName" placeholder="Item Name" required />
         <input name="quantity" type="number" placeholder="Quantity" required style={{ width: '70px' }} />
         <input name="unit" placeholder="Unit" required />
-        <input name="expiryDate" type="date" />
+        {/* <input name="expiryDate" placeholder="Expiry Date" type="date" /> */}
+        <input
+  name="expiryDate"
+  type="text"
+  placeholder="Expiry Date"
+  onFocus={(e) => (e.target.type = "date")}
+  onBlur={(e) => {
+    if (!e.target.value) e.target.type = "text";
+  }}
+  style={{ marginRight: '8px' }}
+/>
+
         <button type="submit">Add</button>
       </form>
 

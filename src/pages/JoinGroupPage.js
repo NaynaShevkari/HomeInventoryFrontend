@@ -60,6 +60,9 @@ function JoinGroupPage() {
         <button type="submit" style={{ marginTop: '20px', padding: '10px 20px' }}>
           Send Join Request
         </button>
+        <button onClick={() => navigate('/dashboard')} style={{ marginTop: '40px' }}>
+        Back to Dashboard
+      </button>
       </form>
     </div>
   );

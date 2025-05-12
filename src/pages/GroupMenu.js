@@ -1,6 +1,7 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function GroupMenu({ groupName, displayName, approvedMembers, pendingMembers, onApprove }) {
+function GroupMenu({ groupName, displayName, approvedMembers, pendingMembers, onApprove, onLogout, onExitGroup }) {
   return (
     <div
       style={{
@@ -18,6 +19,7 @@ function GroupMenu({ groupName, displayName, approvedMembers, pendingMembers, on
       <p style={{ marginTop: '-10px', fontStyle: 'italic', color: '#555' }}>
         Hello {displayName}
       </p>
+      <hr style={{ margin: '10px 0' }} />
       <h4>Members</h4>
       {approvedMembers.length > 0 ? (
         approvedMembers.map((user) => (
@@ -28,7 +30,7 @@ function GroupMenu({ groupName, displayName, approvedMembers, pendingMembers, on
       ) : (
         <p>No members yet.</p>
       )}
-
+      <hr style={{ margin: '10px 0' }} />
       <h4 style={{ marginTop: '15px' }}>Pending Requests</h4>
       {pendingMembers.length > 0 ? (
         pendingMembers.map((membership) => (
@@ -43,6 +45,14 @@ function GroupMenu({ groupName, displayName, approvedMembers, pendingMembers, on
       ) : (
         <p>No pending requests.</p>
       )}
+
+      <hr style={{ margin: '10px 0' }} />
+      <button onClick={onExitGroup} style={{ marginBottom: '10px', padding: '6px 12px', backgroundColor: '#f5f5f5', border: '1px solid #ccc' }}>
+        Exit Group
+      </button>
+      <button onClick={onLogout} style={{ padding: '6px 12px', backgroundColor: '#ffe0e0', border: '1px solid #ccc' }}>
+        Logout
+      </button>
     </div>
   );
 }
