@@ -1,5 +1,10 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import InventorySection from './InventorySection';
+import ShoppingListSection from './ShoppingListSection';
+import GroupMenu from './GroupMenu';
+
 
 function GroupDetailsPage() {
   const { groupId } = useParams();
@@ -8,95 +13,118 @@ function GroupDetailsPage() {
   const [groupName, setGroupName] = useState('');
   const [approvedMembers, setApprovedMembers] = useState([]);
   const [pendingMembers, setPendingMembers] = useState([]);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [selectedTab, setSelectedTab] = useState('inventory');
+  const [inventoryItems, setInventoryItems] = useState([]);
 
   useEffect(() => {
     const fetchGroupDetails = async () => {
       try {
-        const groupResponse = await fetch(`http://localhost:8080/api/groups/id/${groupId}`);
-        const groupData = await groupResponse.json();
+        const groupRes = await fetch(`http://localhost:8080/api/groups/id/${groupId}`);
+        const groupData = await groupRes.json();
         setGroupName(groupData.groupName);
 
-        const approvedResponse = await fetch(`http://localhost:8080/api/groups/${groupId}/members`);
-        const approvedData = await approvedResponse.json();
+        const approvedRes = await fetch(`http://localhost:8080/api/groups/${groupId}/members`);
+        const approvedData = await approvedRes.json();
         setApprovedMembers(approvedData);
 
-        const pendingResponse = await fetch(`http://localhost:8080/api/groups/${groupId}/pending-members`);
-        const pendingData = await responseHandler(pendingResponse);
+        const pendingRes = await fetch(`http://localhost:8080/api/groups/${groupId}/pending-members`);
+        const pendingData = await pendingRes.json();
         setPendingMembers(pendingData);
       } catch (error) {
-        console.error('Error fetching group details:', error);
+        console.error('Error loading group data:', error);
       }
     };
-
     fetchGroupDetails();
   }, [groupId]);
 
-  const responseHandler = async (res) => {
-    if (res.ok) {
-      return res.json();
-    } else {
-      const errorText = await res.text();
-      throw new Error(errorText);
-    }
-  };
+  useEffect(() => {
+    const fetchInventory = async () => {
+      if (groupName) {
+        try {
+          const res = await fetch(`http://localhost:8080/api/inventory/${groupName}`);
+          const data = await res.json();
+          setInventoryItems(data);
+        } catch (error) {
+          console.error('Error fetching inventory:', error);
+        }
+      }
+    };
+    fetchInventory();
+  }, [groupName]);
 
   const handleApprove = async (membershipId) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/users/approve/${membershipId}`, {
-        method: 'POST',
+      const res = await fetch(`http://localhost:8080/api/users/approve/${membershipId}`, {
+        method: 'POST'
       });
-
-      if (response.ok) {
+      if (res.ok) {
         alert('User approved!');
         window.location.reload();
       } else {
-        const errorText = await response.text();
-        alert(`Error: ${errorText}`);
+        alert('Error approving user.');
       }
-    } catch (error) {
-      alert('Something went wrong.');
-      console.error('Approval error:', error);
+    } catch (err) {
+      console.error('Approval error:', err);
     }
   };
 
+  const handleMarkFinished = async (item) => {
+    const confirm = window.confirm("Do you want to add this item to the shopping list?");
+    const addToShopping = confirm ? "true" : "false";
+
+    try {
+      const res = await fetch(`http://localhost:8080/api/inventory/finish/${item.itemId}?addToShopping=${addToShopping}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        alert("Item marked as finished.");
+        const invRes = await fetch(`http://localhost:8080/api/inventory/${groupName}`);
+        const invData = await invRes.json();
+        setInventoryItems(invData);
+      } else {
+        alert("Failed to update item.");
+      }
+    } catch (err) {
+      console.error("Error marking item as finished:", err);
+    }
+  };
+
+  const displayName = localStorage.getItem('displayName');
+
+
+
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>Group: {groupName}</h2>
+    <div style={{ padding: '20px', position: 'relative' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+        <div onClick={() => setMenuOpen(!menuOpen)} style={{ fontSize: '24px', cursor: 'pointer' }}>
+          &#9776;
+        </div>
+      </div>
 
-      <h3 style={{ marginTop: '30px' }}>Approved Members</h3>
-      {approvedMembers.length > 0 ? (
-        approvedMembers.map((user) => (
-          <div key={user.userId} style={{ marginBottom: '8px' }}>
-            <strong>{user.displayName}</strong> ({user.username})
-          </div>
-        ))
-      ) : (
-        <p>No approved members yet.</p>
-      )}
+{menuOpen && (
+  <GroupMenu
+    groupName={groupName}
+    displayName={displayName}
+    approvedMembers={approvedMembers}
+    pendingMembers={pendingMembers}
+    onApprove={handleApprove}
+  />
+)}
+      <div style={{ marginTop: '30px' }}>
+        <button onClick={() => setSelectedTab('inventory')} style={{ marginRight: '10px' }}>
+          Inventory
+        </button>
+        <button onClick={() => setSelectedTab('shopping')}>
+          Shopping List
+        </button>
+      </div>
 
-      <h3 style={{ marginTop: '30px' }}>Pending Join Requests</h3>
-      {pendingMembers.length > 0 ? (
-        pendingMembers.map((membership) => (
-          <div
-            key={membership.membershipId}
-            style={{
-              border: '1px solid gray',
-              borderRadius: '8px',
-              padding: '10px',
-              marginBottom: '10px',
-              textAlign: 'left'
-            }}
-          >
-            <strong>{membership.user.displayName}</strong> ({membership.user.username})
-            <br />
-            <button onClick={() => handleApprove(membership.membershipId)} style={{ marginTop: '5px' }}>
-              Approve
-            </button>
-          </div>
-        ))
-      ) : (
-        <p>No pending requests.</p>
-      )}
+      <div style={{ marginTop: '20px' }}>
+        {selectedTab === 'inventory' && <InventorySection groupName={groupName} />}
+
+        {selectedTab === 'shopping' && <ShoppingListSection groupName={groupName} />}
+      </div>
 
       <button onClick={() => navigate('/dashboard')} style={{ marginTop: '40px' }}>
         Back to Dashboard
