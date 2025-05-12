@@ -57,7 +57,7 @@
 //     if (!window.confirm('Are you sure you want to delete this item?')) return;
 
 //     const res = await fetch(`http://localhost:8080/api/shopping/delete/${itemId}`, {
-//       method: 'DELETE'
+//       method: 'DELETE',
 //     });
 
 //     if (res.ok) {
@@ -72,7 +72,7 @@
 //     if (!window.confirm('Mark this item as bought and add to inventory?')) return;
 
 //     const res = await fetch(`http://localhost:8080/api/shopping/bought/${itemId}`, {
-//       method: 'POST'
+//       method: 'POST',
 //     });
 
 //     if (res.ok) {
@@ -86,15 +86,19 @@
 //   const handleUpdateSubmit = async (e) => {
 //     e.preventDefault();
 //     const formData = new FormData(e.target);
-//     const res = await fetch(`http://localhost:8080/api/shopping/update/${editItem.shoppingItemId}`, {
-//       method: 'PUT',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify({
-//         itemName: formData.get('itemName'),
-//         quantity: formData.get('quantity'),
-//         unit: formData.get('unit')
-//       })
-//     });
+
+//     const res = await fetch(
+//       `http://localhost:8080/api/shopping/update/${editItem.shoppingItemId}`,
+//       {
+//         method: 'PUT',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({
+//           itemName: formData.get('itemName'),
+//           quantity: formData.get('quantity'),
+//           unit: formData.get('unit'),
+//         }),
+//       }
+//     );
 
 //     if (res.ok) {
 //       alert('Item updated!');
@@ -119,12 +123,18 @@
 
 //       {shoppingItems.length > 0 ? (
 //         <ul>
-//           {shoppingItems.map(item => (
+//           {shoppingItems.map((item) => (
 //             <li key={item.shoppingItemId} style={{ marginBottom: '10px' }}>
-//               {item.itemName} — {item.quantity}{item.unit}
-//               <button onClick={() => setEditItem(item)} style={{ marginLeft: '10px' }}>Update</button>
-//               <button onClick={() => handleDelete(item.shoppingItemId)} style={{ marginLeft: '10px' }}>Delete</button>
-//               <button onClick={() => handleMarkAsBought(item.shoppingItemId)} style={{ marginLeft: '10px' }}>Mark as Bought</button>
+//               {item.itemName} — {item.quantity} {item.unit}
+//               <button onClick={() => setEditItem(item)} style={{ marginLeft: '10px' }}>
+//                 Update
+//               </button>
+//               <button onClick={() => handleDelete(item.shoppingItemId)} style={{ marginLeft: '10px' }}>
+//                 Delete
+//               </button>
+//               <button onClick={() => handleMarkAsBought(item.shoppingItemId)} style={{ marginLeft: '10px' }}>
+//                 Mark as Bought
+//               </button>
 //             </li>
 //           ))}
 //         </ul>
@@ -143,9 +153,13 @@
 //             <h2>Edit Item</h2>
 //             <input name="itemName" defaultValue={editItem.itemName} required />
 //             <input name="quantity" type="number" defaultValue={editItem.quantity} required />
-//             <input name="unit" defaultValue={editItem.unit} required />
-//             <button type="submit" style={{ marginRight: '10px' }}>Save</button>
-//             <button type="button" onClick={() => setEditItem(null)}>Cancel</button>
+//             <input name="unit" defaultValue={editItem.unit || ''} placeholder="Unit" required />
+//             <button type="submit" style={{ marginRight: '10px' }}>
+//               Save
+//             </button>
+//             <button type="button" onClick={() => setEditItem(null)}>
+//               Cancel
+//             </button>
 //           </form>
 //         )}
 //       </Modal>
@@ -163,6 +177,8 @@ Modal.setAppElement('#root');
 function ShoppingListSection({ groupName }) {
   const [shoppingItems, setShoppingItems] = useState([]);
   const [editItem, setEditItem] = useState(null);
+  const [showBoughtModal, setShowBoughtModal] = useState(false);
+  const [itemToBuy, setItemToBuy] = useState(null);
 
   const fetchShoppingItems = async () => {
     try {
@@ -225,10 +241,14 @@ function ShoppingListSection({ groupName }) {
     }
   };
 
-  const handleMarkAsBought = async (itemId) => {
-    if (!window.confirm('Mark this item as bought and add to inventory?')) return;
+  const handleMarkAsBought = (item) => {
+    setItemToBuy(item);
+    setShowBoughtModal(true);
+  };
 
-    const res = await fetch(`http://localhost:8080/api/shopping/bought/${itemId}`, {
+  const confirmMarkAsBought = async () => {
+    if (!itemToBuy) return;
+    const res = await fetch(`http://localhost:8080/api/shopping/bought/${itemToBuy.shoppingItemId}`, {
       method: 'POST',
     });
 
@@ -238,6 +258,8 @@ function ShoppingListSection({ groupName }) {
     } else {
       alert('Failed to mark as bought');
     }
+    setShowBoughtModal(false);
+    setItemToBuy(null);
   };
 
   const handleUpdateSubmit = async (e) => {
@@ -289,7 +311,7 @@ function ShoppingListSection({ groupName }) {
               <button onClick={() => handleDelete(item.shoppingItemId)} style={{ marginLeft: '10px' }}>
                 Delete
               </button>
-              <button onClick={() => handleMarkAsBought(item.shoppingItemId)} style={{ marginLeft: '10px' }}>
+              <button onClick={() => handleMarkAsBought(item)} style={{ marginLeft: '10px' }}>
                 Mark as Bought
               </button>
             </li>
@@ -311,18 +333,26 @@ function ShoppingListSection({ groupName }) {
             <input name="itemName" defaultValue={editItem.itemName} required />
             <input name="quantity" type="number" defaultValue={editItem.quantity} required />
             <input name="unit" defaultValue={editItem.unit || ''} placeholder="Unit" required />
-            <button type="submit" style={{ marginRight: '10px' }}>
-              Save
-            </button>
-            <button type="button" onClick={() => setEditItem(null)}>
-              Cancel
-            </button>
+            <button type="submit" style={{ marginRight: '10px' }}>Save</button>
+            <button type="button" onClick={() => setEditItem(null)}>Cancel</button>
           </form>
         )}
+      </Modal>
+
+      <Modal
+        isOpen={showBoughtModal}
+        onRequestClose={() => setShowBoughtModal(false)}
+        contentLabel="Confirm Mark as Bought"
+        style={{ content: { width: '400px', margin: 'auto', textAlign: 'center' } }}
+      >
+        <h2>Mark this item as bought and move to inventory?</h2>
+        <button onClick={confirmMarkAsBought} style={{ marginRight: '10px' }}>Yes</button>
+        <button onClick={() => setShowBoughtModal(false)}>No</button>
       </Modal>
     </div>
   );
 }
 
 export default ShoppingListSection;
+
 
