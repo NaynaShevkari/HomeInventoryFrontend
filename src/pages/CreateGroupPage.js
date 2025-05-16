@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../utils/api';
 
 function CreateGroupPage() {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ function CreateGroupPage() {
     params.append('username', username);
 
     try {
-      const response = await fetch(`http://localhost:8080/api/groups/create?${params.toString()}`, {
+      const response = await fetch(`${BASE_URL}/api/groups/create?${params.toString()}`, {
         method: 'POST',
       });
 

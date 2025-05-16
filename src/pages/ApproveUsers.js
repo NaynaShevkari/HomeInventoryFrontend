@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../utils/api';
 
 function ApproveUsers() {
   const navigate = useNavigate();
@@ -10,7 +11,7 @@ function ApproveUsers() {
     if (!groupName) return;
 
     try {
-      const response = await fetch(`http://localhost:8080/api/users/pending/${groupName}`);
+      const response = await fetch(`${BASE_URL}/api/users/pending/${groupName}`);
       if (response.ok) {
         const data = await response.json();
         setPendingUsers(data);
@@ -25,7 +26,7 @@ function ApproveUsers() {
 
   const approveUser = async (userId) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/users/approve/${userId}`, {
+      const response = await fetch(`${BASE_URL}/api/users/approve/${userId}`, {
         method: 'POST',
       });
       if (response.ok) {

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import InventorySection from './InventorySection';
 import ShoppingListSection from './ShoppingListSection';
 import GroupMenu from './GroupMenu';
+import { BASE_URL } from '../utils/api';
 
 function GroupDetailsPage() {
   const { groupId } = useParams();
@@ -18,15 +19,15 @@ function GroupDetailsPage() {
   useEffect(() => {
     const fetchGroupDetails = async () => {
       try {
-        const groupRes = await fetch(`http://localhost:8080/api/groups/id/${groupId}`);
+        const groupRes = await fetch(`${BASE_URL}/api/groups/id/${groupId}`);
         const groupData = await groupRes.json();
         setGroupName(groupData.groupName);
 
-        const approvedRes = await fetch(`http://localhost:8080/api/groups/${groupId}/members`);
+        const approvedRes = await fetch(`${BASE_URL}/api/groups/${groupId}/members`);
         const approvedData = await approvedRes.json();
         setApprovedMembers(approvedData);
 
-        const pendingRes = await fetch(`http://localhost:8080/api/groups/${groupId}/pending-members`);
+        const pendingRes = await fetch(`${BASE_URL}/api/groups/${groupId}/pending-members`);
         const pendingData = await pendingRes.json();
         setPendingMembers(pendingData);
       } catch (error) {
@@ -40,7 +41,7 @@ function GroupDetailsPage() {
     const fetchInventory = async () => {
       if (groupName) {
         try {
-          const res = await fetch(`http://localhost:8080/api/inventory/${groupName}`);
+          const res = await fetch(`${BASE_URL}/api/inventory/${groupName}`);
           const data = await res.json();
           setInventoryItems(data);
         } catch (error) {
@@ -53,7 +54,7 @@ function GroupDetailsPage() {
 
   const handleApprove = async (membershipId) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/users/approve/${membershipId}`, {
+      const res = await fetch(`${BASE_URL}/api/users/approve/${membershipId}`, {
         method: 'POST'
       });
       if (res.ok) {
@@ -81,7 +82,7 @@ function GroupDetailsPage() {
 
     const username = localStorage.getItem('loggedInUsername');
     try {
-      const res = await fetch(`http://localhost:8080/api/groups/${groupId}/exit?username=${username}`, {
+      const res = await fetch(`${BASE_URL}/api/groups/${groupId}/exit?username=${username}`, {
         method: 'DELETE',
       });
       if (res.ok) {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../utils/api';
 
 function DashboardPage() {
   const navigate = useNavigate();
@@ -7,6 +8,7 @@ function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const username = localStorage.getItem('loggedInUsername');
   const displayName = localStorage.getItem('displayName');
+  
 
   useEffect(() => {
     if (!username) {
@@ -17,7 +19,7 @@ function DashboardPage() {
     const fetchGroups = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`http://localhost:8080/api/users/groups/${username}`);
+        const response = await fetch(`${BASE_URL}/api/users/groups/${username}`);
         if (response.ok) {
           const data = await response.json();
           setGroups(data);

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../utils/api';
 
 function JoinGroupPage() {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ function JoinGroupPage() {
     params.append('groupName', groupName);
 
     try {
-      const response = await fetch(`http://localhost:8080/api/users/join?${params.toString()}`, {
+      const response = await fetch(`${BASE_URL}/api/users/join?${params.toString()}`, {
         method: 'POST',
       });
 

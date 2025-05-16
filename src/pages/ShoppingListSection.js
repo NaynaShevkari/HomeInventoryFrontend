@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Modal from 'react-modal';
+import { BASE_URL } from '../utils/api';
 
 Modal.setAppElement('#root');
 
@@ -11,7 +12,7 @@ function ShoppingListSection({ groupName }) {
 
   const fetchShoppingItems = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/api/shopping/${groupName}`);
+      const res = await fetch(`${BASE_URL}/api/shopping/${groupName}`);
       const data = await res.json();
       setShoppingItems(data);
     } catch (err) {
@@ -41,7 +42,7 @@ function ShoppingListSection({ groupName }) {
       unit,
     });
 
-    const res = await fetch(`http://localhost:8080/api/shopping/add?${params.toString()}`, {
+    const res = await fetch(`${BASE_URL}/api/shopping/add?${params.toString()}`, {
       method: 'POST',
     });
 
@@ -58,7 +59,7 @@ function ShoppingListSection({ groupName }) {
   const handleDelete = async (itemId) => {
     if (!window.confirm('Are you sure you want to delete this item?')) return;
 
-    const res = await fetch(`http://localhost:8080/api/shopping/delete/${itemId}`, {
+    const res = await fetch(`${BASE_URL}/api/shopping/delete/${itemId}`, {
       method: 'DELETE',
     });
 
@@ -77,7 +78,7 @@ function ShoppingListSection({ groupName }) {
 
   const confirmMarkAsBought = async () => {
     if (!itemToBuy) return;
-    const res = await fetch(`http://localhost:8080/api/shopping/bought/${itemToBuy.shoppingItemId}`, {
+    const res = await fetch(`${BASE_URL}/api/shopping/bought/${itemToBuy.shoppingItemId}`, {
       method: 'POST',
     });
 
@@ -96,7 +97,7 @@ function ShoppingListSection({ groupName }) {
     const formData = new FormData(e.target);
 
     const res = await fetch(
-      `http://localhost:8080/api/shopping/update/${editItem.shoppingItemId}`,
+      `${BASE_URL}/api/shopping/update/${editItem.shoppingItemId}`,
       {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
