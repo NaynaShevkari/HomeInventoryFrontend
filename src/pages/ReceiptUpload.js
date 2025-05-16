@@ -100,45 +100,7 @@ function ReceiptUpload({ onExtracted }) {
     }
   
     return Array.from(parsedItemsMap.values());
-  };
-  
-
-// const parseReceiptLines = (lines) => {
-//     const parsedItemsMap = new Map();
-  
-//     const blacklistKeywords = [
-//       "total", "subtotal", "vat", "helpline", "tel", "amt", "base",
-//       "disc", "rate", "net", "rewards", "balance", "cash", "payment",
-//       "change", "f", "transaction", "date", "time", "tax", "receipt", "rs.",
-//       "sale", "store", "thank", "invoice"
-//     ];
-  
-//     for (let line of lines) {
-//       const clean = line.trim().toLowerCase();
-//       if (!clean || clean.length < 5) continue;
-//       if (blacklistKeywords.some(word => clean.includes(word))) continue;
-//       if (/\d{2}:\d{2}/.test(clean) || /\d{2}\/\d{2}/.test(clean)) continue;
-//       if (/^\||^\/|^\d{4}/.test(clean)) continue;
-  
-//       const match = line.match(/^(.+?)\s+\$([\d.]+)$/);
-//       if (match) {
-//         let itemName = match[1].trim();
-//         if (!/[a-zA-Z]/.test(itemName)) continue;
-//         itemName = itemName.replace(/[^a-zA-Z0-9\s/()\-]/g, '');
-  
-//         // Count occurrences for quantity
-//         const key = itemName.toLowerCase();
-//         if (parsedItemsMap.has(key)) {
-//           parsedItemsMap.get(key).quantity += 1;
-//         } else {
-//           parsedItemsMap.set(key, { itemName, quantity: 1, unit: 'pcs' });
-//         }
-//       }
-//     }
-  
-//     return Array.from(parsedItemsMap.values());
-//   };
-  
+  };  
 
   return (
     <div>

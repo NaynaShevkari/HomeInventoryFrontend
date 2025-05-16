@@ -39,11 +39,11 @@ function LoginSignupPage() {
   
       if (response.ok) {
         if (isLogin) {
-          const data = await response.json(); // Login returns user object
+          const data = await response.json(); 
           localStorage.setItem('loggedInUsername', data.username);
           localStorage.setItem('displayName', data.displayName);
         } else {
-          const message = await response.text(); // Signup returns plain text
+          const message = await response.text(); 
           console.log('Signup response:', message);
           localStorage.setItem('loggedInUsername', username);
           localStorage.setItem('displayName', displayName);

@@ -10,7 +10,7 @@ function App() {
 
   return (
     <div>
-      <h1>Home Inventory Management app</h1>
+      {/* <h1>Home Inventory Management app</h1> */}
       <Routes>
         <Route path="/" element={<LoginSignupPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />

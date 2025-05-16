@@ -30,7 +30,7 @@ function ApproveUsers() {
       });
       if (response.ok) {
         alert('User approved successfully!');
-        fetchPendingUsers(); // Refresh the list
+        fetchPendingUsers(); 
       } else {
         alert('Error approving user.');
       }

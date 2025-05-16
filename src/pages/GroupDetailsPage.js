@@ -1,10 +1,8 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import InventorySection from './InventorySection';
 import ShoppingListSection from './ShoppingListSection';
 import GroupMenu from './GroupMenu';
-
 
 function GroupDetailsPage() {
   const { groupId } = useParams();
@@ -80,7 +78,7 @@ function GroupDetailsPage() {
   const handleExitGroup = async () => {
     const confirmExit = window.confirm("Are you sure you want to exit this group?");
     if (!confirmExit) return;
-  
+
     const username = localStorage.getItem('loggedInUsername');
     try {
       const res = await fetch(`http://localhost:8080/api/groups/${groupId}/exit?username=${username}`, {
@@ -95,47 +93,113 @@ function GroupDetailsPage() {
     } catch (err) {
       console.error("Exit group error:", err);
     }
-  };  
+  };
 
   return (
-    <div style={{ padding: '20px', position: 'relative' }}>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-        <div onClick={() => setMenuOpen(!menuOpen)} style={{ fontSize: '24px', cursor: 'pointer' }}>
-          &#9776;
+    <div style={{
+      padding: '20px',
+      fontFamily: 'Arial, sans-serif',
+      backgroundColor: '#f5f7fa',
+      minHeight: '100vh',
+      boxSizing: 'border-box'
+    }}>
+      {/* Top Bar */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <h2 style={{ fontSize: '1.2rem', color: '#333', margin: 0 }}>{groupName}</h2>
+        <div
+          onClick={() => setMenuOpen(!menuOpen)}
+          style={{
+            fontSize: '28px',
+            cursor: 'pointer',
+            backgroundColor: '#fff',
+            borderRadius: '6px',
+            padding: '6px 12px',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+          }}
+        >
+          ☰
         </div>
       </div>
 
-{menuOpen && (
-  <GroupMenu
-    groupName={groupName}
-    displayName={displayName}
-    approvedMembers={approvedMembers}
-    pendingMembers={pendingMembers}
-    onApprove={handleApprove}
-    onLogout={handleLogout}
-    onExitGroup={handleExitGroup}
-  />
-)}
-      <div style={{ marginTop: '30px' }}>
-        <button onClick={() => setSelectedTab('inventory')} style={{ marginRight: '10px' }}>
-          Inventory
+      {/* Side Menu */}
+      {menuOpen && (
+        <GroupMenu
+          groupName={groupName}
+          displayName={displayName}
+          approvedMembers={approvedMembers}
+          pendingMembers={pendingMembers}
+          onApprove={handleApprove}
+          onLogout={handleLogout}
+          onExitGroup={handleExitGroup}
+        />
+      )}
+
+      {/* Tabs */}
+      <div style={{
+        display: 'flex',
+        gap: '10px',
+        marginTop: '25px',
+        flexWrap: 'wrap'
+      }}>
+        <button
+          onClick={() => setSelectedTab('inventory')}
+          style={{
+            flex: 1,
+            padding: '10px',
+            borderRadius: '8px',
+            border: selectedTab === 'inventory' ? '2px solid #4a6ee0' : '1px solid #ccc',
+            backgroundColor: selectedTab === 'inventory' ? '#e8edff' : '#fff',
+            fontWeight: '600',
+            cursor: 'pointer'
+          }}
+        >
+          📦 Inventory
         </button>
-        <button onClick={() => setSelectedTab('shopping')}>
-          Shopping List
+        <button
+          onClick={() => setSelectedTab('shopping')}
+          style={{
+            flex: 1,
+            padding: '10px',
+            borderRadius: '8px',
+            border: selectedTab === 'shopping' ? '2px solid #12b76a' : '1px solid #ccc',
+            backgroundColor: selectedTab === 'shopping' ? '#e6f9f0' : '#fff',
+            fontWeight: '600',
+            cursor: 'pointer'
+          }}
+        >
+          🛒 Shopping List
         </button>
       </div>
 
+      {/* Section View */}
       <div style={{ marginTop: '20px' }}>
         {selectedTab === 'inventory' && <InventorySection groupName={groupName} />}
-
         {selectedTab === 'shopping' && <ShoppingListSection groupName={groupName} />}
       </div>
 
-      <button onClick={() => navigate('/dashboard')} style={{ marginTop: '40px' }}>
-        Back to Dashboard
-      </button>
+      {/* Back Button */}
+      <div style={{ textAlign: 'center', marginTop: '40px' }}>
+        <button
+          onClick={() => navigate('/dashboard')}
+          style={{
+            backgroundColor: 'transparent',
+            border: '1px solid #ccc',
+            borderRadius: '6px',
+            padding: '10px 16px',
+            fontSize: '0.9rem',
+            cursor: 'pointer'
+          }}
+        >
+          ⬅ Back to Dashboard
+        </button>
+      </div>
     </div>
   );
 }
 
 export default GroupDetailsPage;
+
