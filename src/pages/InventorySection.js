@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import ReceiptUpload from './ReceiptUpload';
 import ExtractedItemsModal from './ExtractedItemsModal';
+import { BASE_URL } from '../utils/api';
 
 Modal.setAppElement('#root');
 
@@ -15,7 +16,7 @@ function InventorySection({ groupName }) {
 
   useEffect(() => {
     if (groupName) {
-      fetch(`http://localhost:8080/api/inventory/${groupName}`)
+      fetch(`${BASE_URL}/api/inventory/${groupName}`)
         .then(res => res.json())
         .then(data => setInventoryItems(data))
         .catch(err => console.error('Error fetching inventory:', err));
@@ -23,7 +24,7 @@ function InventorySection({ groupName }) {
   }, [groupName]);
 
   const reloadInventory = async () => {
-    const res = await fetch(`http://localhost:8080/api/inventory/${groupName}`);
+    const res = await fetch(`${BASE_URL}/api/inventory/${groupName}`);
     const data = await res.json();
     setInventoryItems(data);
   };
@@ -42,7 +43,7 @@ function InventorySection({ groupName }) {
     });
     if (formData.get('expiryDate')) params.append('expiryDate', formData.get('expiryDate'));
 
-    const res = await fetch(`http://localhost:8080/api/inventory/add?${params.toString()}`, {
+    const res = await fetch(`${BASE_URL}/api/inventory/add?${params.toString()}`, {
       method: 'POST',
     });
 
@@ -58,7 +59,7 @@ function InventorySection({ groupName }) {
 
   const handleDelete = async (itemId) => {
     if (!window.confirm('Are you sure you want to delete this item?')) return;
-    const res = await fetch(`http://localhost:8080/api/inventory/delete/${itemId}`, { method: 'DELETE' });
+    const res = await fetch(`${BASE_URL}/api/inventory/delete/${itemId}`, { method: 'DELETE' });
     if (res.ok) {
       alert('Item deleted.');
       reloadInventory();
@@ -74,7 +75,7 @@ function InventorySection({ groupName }) {
 
   const confirmMarkFinished = async () => {
     const addToShopping = window.confirm("Do you want to add this item to the shopping list?") ? "true" : "false";
-    const res = await fetch(`http://localhost:8080/api/inventory/finish/${itemToFinish.itemId}?addToShopping=${addToShopping}`, {
+    const res = await fetch(`${BASE_URL}/api/inventory/finish/${itemToFinish.itemId}?addToShopping=${addToShopping}`, {
       method: 'DELETE'
     });
 
@@ -94,7 +95,7 @@ function InventorySection({ groupName }) {
     const formData = new FormData(e.target);
     const { itemId } = editItem;
 
-    const res = await fetch(`http://localhost:8080/api/inventory/update/${itemId}`, {
+    const res = await fetch(`${BASE_URL}/api/inventory/update/${itemId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -130,7 +131,7 @@ function InventorySection({ groupName }) {
         quantity: item.quantity,
         unit: item.unit
       });
-      await fetch(`http://localhost:8080/api/inventory/add?${params.toString()}`, { method: 'POST' });
+      await fetch(`${BASE_URL}/api/inventory/add?${params.toString()}`, { method: 'POST' });
     }
     alert('Extracted items added to inventory!');
     reloadInventory();

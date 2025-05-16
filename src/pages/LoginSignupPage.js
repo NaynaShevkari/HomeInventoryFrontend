@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../utils/api';
 
 function LoginSignupPage() {
   const navigate = useNavigate();
@@ -30,8 +31,8 @@ function LoginSignupPage() {
   
     try {
       const url = isLogin
-        ? `http://localhost:8080/api/auth/login`
-        : `http://localhost:8080/api/auth/signup`;
+        ? `${BASE_URL}/api/auth/login`
+        : `${BASE_URL}/api/auth/signup`;
   
       const response = await fetch(`${url}?${params.toString()}`, {
         method: 'POST',
