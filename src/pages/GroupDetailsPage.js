@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import InventorySection from './InventorySection';
 import ShoppingListSection from './ShoppingListSection';
@@ -15,6 +15,8 @@ function GroupDetailsPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState('inventory');
   const [inventoryItems, setInventoryItems] = useState([]);
+
+  const menuRef = useRef(null);
 
   useEffect(() => {
     const fetchGroupDetails = async () => {
@@ -96,6 +98,24 @@ function GroupDetailsPage() {
     }
   };
 
+    useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    };
+
+    if (menuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [menuOpen]);
+
   return (
     <div style={{
       padding: '20px',
@@ -128,6 +148,7 @@ function GroupDetailsPage() {
 
       {/* Side Menu */}
       {menuOpen && (
+        <div ref={menuRef}>
         <GroupMenu
           groupName={groupName}
           displayName={displayName}
@@ -137,6 +158,7 @@ function GroupDetailsPage() {
           onLogout={handleLogout}
           onExitGroup={handleExitGroup}
         />
+        </div>
       )}
 
       {/* Tabs */}
