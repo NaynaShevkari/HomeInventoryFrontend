@@ -33,7 +33,18 @@ function InventorySection({ groupName }) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const username = localStorage.getItem('loggedInUsername');
+    const expiryDateValue = formData.get('expiryDate');
 
+      if (expiryDateValue) {
+    const selectedDate = new Date(expiryDateValue);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set time to start of day
+
+    if (selectedDate < today) {
+      alert("Expiry date cannot be in the past.");
+      return;
+    }
+  }
     const params = new URLSearchParams({
       groupName,
       username,
@@ -41,7 +52,11 @@ function InventorySection({ groupName }) {
       quantity: formData.get('quantity'),
       unit: formData.get('unit'),
     });
-    if (formData.get('expiryDate')) params.append('expiryDate', formData.get('expiryDate'));
+
+  if (expiryDateValue) {
+    params.append('expiryDate', expiryDateValue);
+  }
+    // if (formData.get('expiryDate')) params.append('expiryDate', formData.get('expiryDate'));
 
     const res = await fetch(`${BASE_URL}/api/inventory/add?${params.toString()}`, {
       method: 'POST',
