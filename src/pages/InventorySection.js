@@ -109,7 +109,18 @@ function InventorySection({ groupName }) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const { itemId } = editItem;
+    const expiryDateValue = formData.get('expiryDate');
 
+    if (expiryDateValue) {
+    const selectedDate = new Date(expiryDateValue);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // normalize to midnight
+
+    if (selectedDate < today) {
+      alert("Expiry date cannot be in the past.");
+      return;
+    }
+  }
     const res = await fetch(`${BASE_URL}/api/inventory/update/${itemId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -117,7 +128,7 @@ function InventorySection({ groupName }) {
         itemName: formData.get('itemName'),
         quantity: formData.get('quantity'),
         unit: formData.get('unit'),
-        expiryDate: formData.get('expiryDate') || null
+        expiryDate: expiryDateValue  || null
       }),
     });
 
